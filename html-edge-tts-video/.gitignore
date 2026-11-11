@@ -1,0 +1,31 @@
+# Python caches and virtualenvs
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+env/
+
+# JavaScript dependencies and logs
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Local projects, manifests, project generated media, voice previews, Playwright
+# browsers/recordings, and render outputs. The starter's two authored source
+# files are the only tracked exception under .local/; its manifest is generated.
+.local/*
+!.local/work/
+.local/work/*
+!.local/work/starter/
+.local/work/starter/*
+!.local/work/starter/body.html
+!.local/work/starter/scenes.json
+tests/
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/

@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+    <meta name="app-base-path" content="" />
+    <script src="/studio/web/shared/urls.js"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>源文件编辑器</title>
+  <link rel="icon" href="/studio/web/shared/favicon.ico" />
+  <link rel="stylesheet" href="/studio/web/source/source.css" />
+  <link rel="stylesheet" href="/studio/web/shared/app-shell.css" />
+  <link rel="stylesheet" href="/studio/web/shared/mobile.css" />
+  <link rel="stylesheet" href="/studio/web/shared/theme.css" />
+  <script defer src="/studio/web/shared/app-ui.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/lucide@0.513.0/dist/umd/lucide.min.js"></script>
+  <script defer src="/studio/web/source/source.js"></script>
+</head>
+<body>
+  <main class="source-app">
+    <aside class="source-sidebar app-sidebar">
+      <div class="sidebar-brand">
+        <img class="brand-mark" src="/studio/web/shared/app.svg" alt="" />
+        <div><p class="eyebrow">本地视频工厂</p><h1>视频工厂</h1></div>
+      </div>
+      <nav class="product-nav" aria-label="产品工具">
+        <p class="nav-label">产品工具</p>
+        <a href="/studio"><i data-lucide="folder"></i><span>工作室</span></a>
+        <a class="active" href="/source" aria-current="page"><i data-lucide="code-xml"></i><span>源文件</span></a>
+        <a href="/captions"><i data-lucide="captions"></i><span>字幕</span></a>
+        <span class="nav-separator" aria-hidden="true"></span>
+        <a href="/voices"><i data-lucide="audio-lines"></i><span>语音试听</span></a>
+      </nav>
+      <div class="sidebar-spacer"></div>
+      <section class="engine-card">
+        <div class="engine-row"><span id="engineDot" class="status-dot"></span><div><strong>引擎状态</strong><p id="engineStatus">连接中</p></div></div>
+        <small>SOURCE · MEDIA · PREVIEW</small>
+      </section>
+    </aside>
+
+    <header class="source-topbar">
+      <div class="project-title">
+        <i data-lucide="code-xml"></i><strong id="sourceProjectName">源文件编辑器</strong><span id="dirtyBadge" class="tool-badge" hidden>未保存</span>
+      </div>
+      <label class="project-picker"><span>项目</span><select id="projectSelect"></select></label>
+      <div class="top-actions">
+        <button id="validateButton" type="button"><i data-lucide="shield-check"></i><span>验证</span></button>
+        <button id="saveButton" class="primary-button" type="button"><i data-lucide="save"></i><span>保存并刷新</span></button>
+      </div>
+    </header>
+
+    <section class="source-workspace">
+      <section class="panel editor-panel">
+        <div class="section-heading">
+          <span class="step-number">01</span>
+          <div><h2>项目源文件</h2><p>编辑场景数据与自包含 HTML；只有旁白结构变化才会使时间轴失效</p></div>
+          <div class="editor-tabs" role="tablist">
+            <button class="active" type="button" data-editor-tab="scenes">scenes.json</button>
+            <button type="button" data-editor-tab="body">body.html</button>
+          </div>
+        </div>
+        <div class="editor-meta">
+          <span id="editorFileName">scenes.json</span>
+          <span id="editorStats">0 字符</span>
+        </div>
+        <textarea id="scenesEditor" class="code-editor" spellcheck="false" aria-label="scenes.json"></textarea>
+        <textarea id="bodyEditor" class="code-editor" spellcheck="false" aria-label="body.html" hidden></textarea>
+        <div class="editor-footer">
+          <span id="saveImpact">保存 HTML 不会删除现有旁白或字幕。</span>
+          <span>Ctrl/⌘ + S 保存</span>
+        </div>
+      </section>
+
+      <section class="panel preview-panel">
+        <div class="section-heading">
+          <span class="step-number">02</span>
+          <div><h2>场景画布</h2><p>场景切换由稳定 Shell 控制；可编辑对象可直接拖动、缩放或双击文字</p></div>
+          <button id="addTextButton" type="button"><i data-lucide="type"></i><span>文字</span></button>
+          <button id="addShapeButton" type="button"><i data-lucide="square"></i><span>色块</span></button>
+          <label class="shape-color-control" title="新建或所选色块的颜色">
+            <input id="shapeColorInput" type="color" value="#dff3ee" aria-label="色块颜色" />
+          </label>
+          <button id="reloadPreviewButton" type="button"><i data-lucide="refresh-cw"></i><span>刷新</span></button>
+        </div>
+        <div class="scene-toolbar">
+          <button id="previousSceneButton" type="button" aria-label="上一场景"><i data-lucide="chevron-left"></i></button>
+          <div id="sceneNavigator" class="scene-navigator" aria-label="场景导航"></div>
+          <button id="nextSceneButton" type="button" aria-label="下一场景"><i data-lucide="chevron-right"></i></button>
+        </div>
+        <div id="previewWrap" class="preview-wrap">
+          <div id="previewViewport" class="preview-viewport">
+            <iframe id="previewFrame" title="项目源文件预览" src="about:blank"></iframe>
+          </div>
+        </div>
+        <div id="objectInspector" class="object-inspector">
+          <strong id="selectedObjectLabel">未选择对象</strong>
+          <label>X <input id="objectX" type="number" step="1" disabled /></label>
+          <label>Y <input id="objectY" type="number" step="1" disabled /></label>
+          <label>W <input id="objectWidth" type="number" min="1" step="1" disabled /></label>
+          <label>H <input id="objectHeight" type="number" min="1" step="1" disabled /></label>
+          <label>动效
+            <select id="objectMotion" disabled>
+              <option value="">无</option>
+              <option value="fade">淡入</option>
+              <option value="rise">上浮入场</option>
+              <option value="slide-left">左滑入场</option>
+              <option value="wipe-left">向左揭示</option>
+              <option value="zoom-in">缩放入场</option>
+              <option value="ken-burns-in">缓慢推进</option>
+              <option value="pan-left">向左平移</option>
+              <option value="pan-right">向右平移</option>
+              <option value="pulse-once">单次强调</option>
+            </select>
+          </label>
+          <button id="applyObjectButton" type="button" disabled><i data-lucide="check"></i><span>应用</span></button>
+          <button id="deleteObjectButton" type="button" disabled><i data-lucide="trash-2"></i><span>删除</span></button>
+        </div>
+      </section>
+
+      <section class="panel media-panel">
+        <div class="section-heading">
+          <span class="step-number">03</span>
+          <div><h2>媒体素材</h2><p>将 HTML 中的 media/... 引用补齐为项目本地图片或视频</p></div>
+          <button id="uploadButton" type="button"><i data-lucide="upload"></i><span>上传素材</span></button>
+          <input id="mediaInput" type="file" accept=".png,.jpg,.jpeg,.webp,.avif,.gif,.mp4,.webm" multiple hidden />
+        </div>
+        <div id="dropZone" class="drop-zone">
+          <i data-lucide="image-plus"></i>
+          <div><strong>拖入图片或视频</strong><span>也可以从剪贴板粘贴图片；最大 150MB</span></div>
+        </div>
+        <div class="media-columns">
+          <section>
+            <div class="subheading"><strong>缺失插槽</strong><span id="missingCount">0</span></div>
+            <div id="missingList" class="missing-list"></div>
+          </section>
+          <section>
+            <div class="subheading"><strong>项目素材</strong><span id="mediaCount">0</span></div>
+            <div id="mediaList" class="media-list"></div>
+          </section>
+        </div>
+      </section>
+    </section>
+
+    <div id="notification" class="notification" role="status" aria-live="polite"></div>
+  </main>
+</body>
+</html>

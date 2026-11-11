@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title data-i18n="app.title">Git Folder Dashboard</title>
+    <link rel="stylesheet" href="{{ style_url }}" />
+  </head>
+  <body>
+    <div id="globalLoading" class="global-loading" hidden>
+      <div class="global-loading-card">
+        <div class="global-loading-spinner" aria-hidden="true"></div>
+        <p id="globalLoadingText">Loading...</p>
+      </div>
+    </div>
+
+    <div class="app-layout">
+      <aside class="rail" aria-label="App navigation" data-i18n-aria-label="rail.ariaLabel">
+        <button
+          class="rail-button nav-home active"
+          type="button"
+          data-tab="dashboard"
+          aria-label="Overview"
+          title="Overview"
+          data-tip="Overview"
+          data-i18n-aria-label="tabs.dashboard"
+          data-i18n-title="tabs.dashboard"
+          data-i18n-tip="tabs.dashboard"
+        ></button>
+        <button
+          class="rail-button nav-multi"
+          type="button"
+          data-tab="repositories"
+          aria-label="Repositories"
+          title="Repositories"
+          data-tip="Repositories"
+          data-i18n-aria-label="tabs.repositories"
+          data-i18n-title="tabs.repositories"
+          data-i18n-tip="tabs.repositories"
+        ></button>
+        <button
+          class="rail-button nav-frok"
+          type="button"
+          data-tab="branches"
+          aria-label="Branches"
+          title="Branches"
+          data-tip="Branches"
+          data-i18n-aria-label="tabs.branches"
+          data-i18n-title="tabs.branches"
+          data-i18n-tip="tabs.branches"
+        ></button>
+        <button
+          class="rail-button nav-sync"
+          type="button"
+          data-tab="sync"
+          aria-label="Sync"
+          title="Sync"
+          data-tip="Sync"
+          data-i18n-aria-label="tabs.sync"
+          data-i18n-title="tabs.sync"
+          data-i18n-tip="tabs.sync"
+        ></button>
+        <button
+          class="rail-button nav-db"
+          type="button"
+          data-tab="local"
+          aria-label="Local folders"
+          title="Local folders"
+          data-tip="Local folders"
+          data-i18n-aria-label="tabs.local"
+          data-i18n-title="tabs.local"
+          data-i18n-tip="tabs.local"
+        ></button>
+
+        <button
+          id="themeButton"
+          class="rail-button rail-bottom theme-toggle"
+          type="button"
+          aria-label="Switch to dark mode"
+          title="Switch theme"
+          data-tip="Switch theme"
+        ></button>
+        <button
+          id="languageButton"
+          class="rail-button language-toggle"
+          type="button"
+          aria-label="Switch to Chinese"
+          title="Switch to Chinese"
+          data-tip="Switch to Chinese"
+        >EN</button>
+      </aside>
+
+      <aside class="sidebar">
+        <section class="workspace-card">
+          <div class="sidebar-title" data-i18n="workspace.title">Workspace</div>
+          <div class="workspace-path-row">
+            <span class="folder-icon"></span>
+            <input
+              id="pathInput"
+              type="text"
+              placeholder="For example ~/Code"
+              autocomplete="off"
+              data-i18n-placeholder="workspace.pathPlaceholder"
+            />
+          </div>
+          <div class="scan-actions">
+            <button id="selectButton" class="secondary" type="button" data-i18n="workspace.select">
+              Select
+            </button>
+            <button id="scanButton" class="primary" type="button" data-i18n="workspace.scan">Scan</button>
+          </div>
+          <div id="errorBox" class="error-box" hidden></div>
+        </section>
+
+        <div class="filter-wrap">
+          <span class="search-icon"></span>
+          <input
+            id="filterInput"
+            type="search"
+            placeholder="Filter repositories"
+            autocomplete="off"
+            data-i18n-placeholder="workspace.filterPlaceholder"
+          />
+        </div>
+
+        <div class="repo-section-label" data-i18n="workspace.repositories">Repositories</div>
+        <div id="sidebarRepoList" class="sidebar-repo-list empty" data-i18n="state.notScanned">Not scanned yet</div>
+
+        <button id="addRepositoryButton" class="add-repo" type="button" data-i18n="workspace.addRepository">
+          Add repository
+        </button>
+      </aside>
+
+      <main class="detail">
+        <section
+          id="repoDetail"
+          class="detail-stack"
+          data-panel="dashboard repositories branches sync"
+        ></section>
+
+        <section class="panel" data-panel="local">
+          <div class="panel-header">
+            <h2 data-i18n="local.title">Non-Git folders</h2>
+            <p data-i18n="local.description">After scanning, folders that are not initialized as Git repositories will appear here.</p>
+          </div>
+          <div id="nonGitList" class="non-git-list empty" data-i18n="state.notScanned">Not scanned yet</div>
+        </section>
+      </main>
+    </div>
+
+    <input
+      id="importSnapshotInput"
+      type="file"
+      accept=".zip,application/zip"
+      hidden
+    />
+
+    <script>
+      window.__APP_BASE_PATH__ = {{ app_base_path|tojson }};
+    </script>
+    <script src="{{ message_js_url }}"></script>
+    <script src="{{ app_js_url }}"></script>
+  </body>
+</html>

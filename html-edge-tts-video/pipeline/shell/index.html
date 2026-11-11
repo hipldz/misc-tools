@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="app-base-path" content="" />
+  <script src="/studio/web/shared/urls.js"></script>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>HTML TTS Video Shell</title>
+  <script>
+    document.documentElement.classList.toggle('render-mode', new URLSearchParams(location.search).has('render'));
+  </script>
+  <link rel="stylesheet" href="shell.css" />
+</head>
+<body>
+  <main id="app" class="composition-shell">
+    <section id="stage" class="stage" aria-live="polite"></section>
+
+    <div class="caption-safe">
+      <div id="caption" class="caption"></div>
+    </div>
+
+    <nav id="chapterRail" class="chapter-rail" aria-label="Video chapters"></nav>
+
+    <audio id="narration" preload="auto"></audio>
+    <div id="sceneTransition" class="scene-transition" aria-hidden="true"></div>
+  </main>
+  <script src="runtime.js"></script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+[qwen]
+region = "beijing" # beijing = 国内，singapore = 国外
+model = "qwen-audio-3.0-asr-flash-streaming"
+language = "zh"
+# prompt = "专有名词：Codex、DashScope"
+
+[audio]
+device = "default"
+sample_rate = 16000
+chunk_ms = 100
+
+[overlay]
+enabled = true
+final_hold_ms = 1200
+width = 620
+bottom_margin = 72

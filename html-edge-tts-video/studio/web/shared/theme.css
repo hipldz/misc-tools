@@ -1,0 +1,186 @@
+/* Editor chrome follows the OS. The authored video lives in its own iframe. */
+:root { color-scheme: light; }
+
+.app-loading {
+  width: min(380px, calc(100vw - 32px));
+  padding: 28px;
+  border: 1px solid var(--line, #dce5f0);
+  border-radius: 16px;
+  background: var(--surface, #fff);
+  color: var(--text, #14233b);
+  box-shadow: 0 20px 70px rgb(0 0 0 / 20%);
+}
+.app-loading::backdrop { background: rgb(15 25 40 / 50%); }
+.app-loading-card { display: grid; justify-items: center; gap: 16px; text-align: center; }
+.app-loading-card strong { font-size: 18px; }
+.app-loading-card p { margin: 0; font-size: 13px; line-height: 1.6; color: var(--muted, #68788e); }
+.app-loading-spinner {
+  width: 30px;
+  height: 30px;
+  border: 3px solid var(--line, #dce5f0);
+  border-top-color: var(--blue, #3479f6);
+  border-radius: 50%;
+  animation: app-loading-spin .9s linear infinite;
+}
+@keyframes app-loading-spin { to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {
+  .app-loading-spinner { animation: none; }
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    color-scheme: dark;
+    --canvas: #101720;
+    --sidebar: #161f2b;
+    --surface: #1b2634;
+    --surface-solid: #1b2634;
+    --surface-soft: #202e3e;
+    --line: #334458;
+    --line-strong: #4a6079;
+    --text: #e5edf7;
+    --muted: #a8b8cc;
+    --faint: #8b9eb7;
+    --blue: #669fff;
+    --blue-strong: #9bc0ff;
+    --blue-soft: #263e60;
+    --green: #72d69a;
+    --red: #ff9aa6;
+    --amber: #f2c477;
+    --shadow: 0 6px 18px rgb(0 0 0 / 15%);
+    --soft-shadow: 0 2px 10px rgb(0 0 0 / 12%);
+    --app-shell-line: var(--line);
+    --app-shell-text: var(--text);
+    --app-shell-muted: var(--muted);
+    --app-shell-blue: var(--blue);
+    --app-shell-blue-strong: var(--blue-strong);
+    --app-shell-blue-soft: var(--blue-soft);
+    --app-shell-green: var(--green);
+  }
+
+  body { background: var(--canvas); color: var(--text); }
+  .studio-app::before { display: none; }
+  * { scrollbar-color: var(--line-strong) transparent; }
+  *::-webkit-scrollbar-thumb { background-color: var(--line-strong); }
+
+  /* Shared navigation, headers, dialogs and panels. */
+  .app-sidebar,
+  .app-sidebar .engine-card,
+  .app-sidebar .settings-link,
+  .studio-header,
+  .source-topbar,
+  .caption-topbar,
+  .voice-topbar,
+  .workflow-topbar,
+  .panel,
+  .new-project-dialog,
+  .studio-workflow-dialog,
+  .caption-guide-dialog,
+  .voice-guide-dialog,
+  .tool-guide-dialog,
+  .job-overlay-card { background: var(--surface); color: var(--text); border-color: var(--line); }
+  .project-drawer { background: var(--surface) !important; border-color: var(--line) !important; }
+  .studio-project-header .header-project-library,
+  .studio-project-header .current-project-hero,
+  .project-card,
+  .output-card,
+  .metric-tile,
+  .guide-card,
+  .source-card,
+  .new-project-choice,
+  .editor-meta,
+  .editor-tabs,
+  .media-thumb,
+  .voice-card,
+  .sample-card,
+  .history-card,
+  .history-item,
+  .preview-stage,
+  .command-strip,
+  .generation-flow,
+  .guide-dialog-heading,
+  .guide-panel .job-status,
+  #audioPlayer { background: var(--surface-soft); color: var(--text); border-color: var(--line); }
+  .workspace > .build-panel > .panel-heading,
+  .build-controls .build-control-section,
+  .status-summary article,
+  .build-next-step { background: var(--surface-soft); color: var(--text); border-color: var(--line); }
+  .build-next-step strong,
+  .build-section-heading strong,
+  .build-control-copy strong,
+  #workspaceProjectTitle { color: var(--text); }
+  .build-next-step p,
+  .build-control-copy span,
+  .build-section-heading span,
+  .preview-source-meta,
+  .preview-source-meta code { color: var(--muted); }
+  .field-label, .provider-hint,
+  .caption-project-picker,
+  .timing-editor label,
+  .caption-text-label,
+  .editor-options label,
+  .timeline-labels, .list-stats, .cue-table-head,
+  .tool-guide-dialog li { color: var(--muted); }
+  .provider-hint.error { color: var(--red); }
+  .generation-flow span, .command-strip code,
+  .tool-guide-dialog li strong { color: var(--text); }
+  .build-controls .build-control-section label,
+  .build-controls .build-control-section .tts-provider-hint { color: var(--muted); }
+  .build-controls .build-control-section .tts-provider-hint.error { color: var(--red); }
+
+  button,
+  input,
+  select,
+  textarea,
+  .project-select,
+  .studio-app .sidebar-toggle,
+  .studio-project-header .project-select,
+  .object-inspector input,
+  .object-inspector select,
+  .code-editor,
+  .code-field,
+  .quiet-button,
+  .secondary-button,
+  .starter-button,
+  .icon-button,
+  .open-output-button,
+  .media-card { background-color: var(--surface); color: var(--text); border-color: var(--line-strong); }
+  input::placeholder, textarea::placeholder { color: var(--faint); }
+  /* Legacy page selectors set form-control backgrounds with higher specificity. */
+  body select,
+  body textarea,
+  body input:not([type="range"]):not([type="color"]) {
+    background: var(--surface) !important;
+    color: var(--text) !important;
+    border-color: var(--line-strong);
+  }
+  button:hover, .quiet-button:hover, .new-project-choice:hover { background-color: var(--surface-soft); border-color: var(--blue); }
+  .primary-button, button.primary-button { background: #3168be; border-color: #477dd0; color: #fff; }
+  .primary-button:hover, button.primary-button:hover { background: #3b76cd; }
+
+  .app-sidebar .product-nav a,
+  .app-sidebar .settings-link,
+  .app-sidebar .eyebrow,
+  .app-sidebar .nav-label,
+  .project-library-head h2,
+  .object-inspector strong,
+  .drop-zone strong,
+  .preview-transport output { color: var(--text); }
+  .app-sidebar .product-nav a.active,
+  .app-sidebar .product-nav a:hover,
+  .project-card.active,
+  .scene-card.active,
+  .cue-item.active,
+  .editor-tabs button.active,
+  .import-mode-tabs button.active,
+  .scene-navigator button.active { background: var(--blue-soft); color: var(--blue-strong); border-color: var(--line-strong); }
+  .drop-zone, .tool-badge, .subheading span, .project-badge { background: var(--surface-soft); color: var(--muted); border-color: var(--line-strong); }
+  .missing-item { background: #392f20; border-color: #75623d; }
+  .missing-item code { color: var(--amber); }
+  .preview-wrap, .preview-frame-area, .preview-frame-wrap, .preview-transport { background: #111c29; border-color: var(--line); }
+  .preview-transport .preview-play-button { background: var(--surface-soft); color: var(--text); border-color: var(--line-strong); }
+  .cue-item, .scene-card, .cue-detail, .timeline-track { background-color: var(--surface-soft); color: var(--text); border-color: var(--line); }
+  .notification, .toast { background: #d4e3f7; color: #14233b; }
+  .notification.error, .toast.error { background: #772e3b; color: #fff; }
+  .job-overlay { background: rgb(8 14 22 / 72%); }
+  .driver-popover, .tour-popover { background: var(--surface); color: var(--text); }
+}

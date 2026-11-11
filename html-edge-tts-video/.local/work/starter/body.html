@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>画面跟着解释走 · 自包含示例</title>
+<style>
+#stage{--ink:#173f3b;--muted:#55716c;--accent:#b66d45;color:var(--ink);background:transparent;font-family:system-ui,sans-serif}
+.content-scene{position:absolute;inset:0;overflow:hidden;background:transparent}.scene-canvas{position:absolute;inset:0}
+.content-scene *{box-sizing:border-box}.content-scene h1,.content-scene h2,.content-scene p{margin:0}
+.content-scene h1{font-size:62px;line-height:1.15;letter-spacing:-2px}.content-scene h2{font-size:42px;line-height:1.2}
+.content-scene .note{font-size:20px;line-height:1.45;color:var(--muted)}.content-scene .accent{color:var(--accent)}
+.content-scene svg{width:100%;height:100%;display:block}.content-scene pre{margin:0;padding:32px;background:#edf5f1;border-left:5px solid #5b9c8c;font:26px/1.7 ui-monospace,monospace;white-space:pre-wrap;overflow:hidden}
+#stage [data-studio-id="source-overview"] svg,#stage [data-studio-id="source-detail"] svg{height:420px;margin-top:14px}
+</style></head><body>
+<section class="content-scene" data-scene="intro"><div class="scene-canvas"><div data-studio-id="intro-title" data-studio-kind="group" style="position:absolute;left:48px;top:60px;width:450px;height:230px" ><h1>先看到变化，<br>再解释原因。</h1></div><div data-studio-id="intro-graph" data-studio-kind="group" style="position:absolute;left:495px;top:85px;width:745px;height:360px" ><svg viewBox="0 0 1000 400" role="img" aria-label="示意图：相同任务的耗时从三十秒降到十二秒，并非产品实测">
+      <rect x="0" y="0" width="1000" height="400" rx="12" fill="#f8fbfa"/>
+      <g fill="none" stroke="#d0ded9" stroke-width="1"><path d="M100 70H940M100 160H940M100 250H940M100 340H940"/></g>
+      <path d="M100 52V340H950" fill="none" stroke="#7e9791" stroke-width="2"/>
+      <g font-family="sans-serif" font-size="23" fill="#55716c"><text x="25" y="78">30s</text><text x="25" y="168">20s</text><text x="25" y="258">10s</text>
+      <text x="160" y="380">原流程</text><text x="443" y="380">步骤合并</text><text x="735" y="380">结果复用</text></g>
+      <rect x="155" y="70" width="155" height="270" rx="5" fill="#9dbcb4"/><rect x="440" y="178" width="155" height="162" rx="5" fill="#5b9c8c"/><rect x="725" y="232" width="155" height="108" rx="5" fill="#c17850"/>
+      <g font-family="sans-serif" font-size="32" font-weight="700" fill="#173f3b"><text x="198" y="55">30</text><text x="484" y="163">18</text><text x="769" y="217">12</text></g>
+    </svg></div><div data-studio-id="intro-label" data-studio-kind="group" style="position:absolute;left:52px;top:465px;width:800px;height:45px" ><p class="note">自包含图解示例 · 示意数据，非产品实测</p></div></div></section>
+<section class="content-scene" data-scene="source"><div class="scene-canvas"><div data-studio-id="source-overview" data-studio-kind="group" data-shot-cues="source-01" style="position:absolute;left:40px;top:28px;width:1190px;height:490px" ><h2>先建立比较口径</h2><svg viewBox="0 0 1000 400" role="img" aria-label="示意图：相同任务的耗时从三十秒降到十二秒，并非产品实测">
+      <rect x="0" y="0" width="1000" height="400" rx="12" fill="#f8fbfa"/>
+      <g fill="none" stroke="#d0ded9" stroke-width="1"><path d="M100 70H940M100 160H940M100 250H940M100 340H940"/></g>
+      <path d="M100 52V340H950" fill="none" stroke="#7e9791" stroke-width="2"/>
+      <g font-family="sans-serif" font-size="23" fill="#55716c"><text x="25" y="78">30s</text><text x="25" y="168">20s</text><text x="25" y="258">10s</text>
+      <text x="160" y="380">原流程</text><text x="443" y="380">步骤合并</text><text x="735" y="380">结果复用</text></g>
+      <rect x="155" y="70" width="155" height="270" rx="5" fill="#9dbcb4"/><rect x="440" y="178" width="155" height="162" rx="5" fill="#5b9c8c"/><rect x="725" y="232" width="155" height="108" rx="5" fill="#c17850"/>
+      <g font-family="sans-serif" font-size="32" font-weight="700" fill="#173f3b"><text x="198" y="55">30</text><text x="484" y="163">18</text><text x="769" y="217">12</text></g>
+    </svg></div><div data-studio-id="source-detail" data-studio-kind="group" data-shot-cues="source-02 source-03" style="position:absolute;left:50px;top:28px;width:710px;height:490px" ><h2>然后聚焦真正的变化</h2><svg viewBox="660 150 300 250" role="img" aria-label="示意图：相同任务的耗时从三十秒降到十二秒，并非产品实测">
+      <rect x="0" y="0" width="1000" height="400" rx="12" fill="#f8fbfa"/>
+      <g fill="none" stroke="#d0ded9" stroke-width="1"><path d="M100 70H940M100 160H940M100 250H940M100 340H940"/></g>
+      <path d="M100 52V340H950" fill="none" stroke="#7e9791" stroke-width="2"/>
+      <g font-family="sans-serif" font-size="23" fill="#55716c"><text x="25" y="78">30s</text><text x="25" y="168">20s</text><text x="25" y="258">10s</text>
+      <text x="160" y="380">原流程</text><text x="443" y="380">步骤合并</text><text x="735" y="380">结果复用</text></g>
+      <rect x="155" y="70" width="155" height="270" rx="5" fill="#9dbcb4"/><rect x="440" y="178" width="155" height="162" rx="5" fill="#5b9c8c"/><rect x="725" y="232" width="155" height="108" rx="5" fill="#c17850"/>
+      <g font-family="sans-serif" font-size="32" font-weight="700" fill="#173f3b"><text x="198" y="55">30</text><text x="484" y="163">18</text><text x="769" y="217">12</text></g>
+    </svg></div><div data-studio-id="source-comparison" data-studio-kind="group" data-shot-cues="source-02 source-03" style="position:absolute;left:810px;top:140px;width:400px;height:310px" ><p class="note">同一任务 · 相同计时范围</p><h1 style="margin-top:40px">30 → <span class="accent">12</span> 秒</h1><p class="note" style="margin-top:30px">这张示意图说明变化，<br>具体原因仍需过程证据。</p></div></div></section>
+<section class="content-scene" data-scene="pipeline"><div class="scene-canvas"><div data-studio-id="pipeline-title" data-studio-kind="group" style="position:absolute;left:48px;top:40px;width:1160px;height:65px" ><h2>镜头跟着解说的具体细节走</h2></div><div data-studio-id="pipeline-code" data-studio-kind="group" data-shot-cues="pipeline-01" style="position:absolute;left:52px;top:145px;width:1160px;height:260px" ><p class="note" style="margin-bottom:20px">本项目 runtime.js · 代码摘录</p><pre>const cue = activeCueAt(state.current);
+const activeScene =
+  activateScene(scene, progress);</pre></div><div data-studio-id="pipeline-cue-example" data-studio-kind="group" data-shot-cues="pipeline-02" style="position:absolute;left:52px;top:145px;width:1160px;height:260px" ><p class="note" style="margin-bottom:20px">body.html · 镜头绑定示例</p><pre>&lt;div data-shot-cues="source-02 source-03"&gt;
+  聚焦结果的画面
+&lt;/div&gt;</pre></div><div data-studio-id="pipeline-clock" data-studio-kind="group" style="position:absolute;left:52px;top:435px;width:1160px;height:75px" ><svg viewBox="0 0 1100 75" aria-label="时间定位示意"><path d="M40 35H1060" stroke="#9dbcb4" stroke-width="5"/><circle id="starter-clock" cx="40" cy="35" r="13" fill="#b66d45"/></svg></div></div></section>
+<section class="content-scene" data-scene="outro" data-frame="media"><div class="scene-canvas"><div data-studio-id="outro-graph" data-studio-kind="group" style="position:absolute;left:30px;top:32px;width:1220px;height:488px" ><svg viewBox="0 0 1000 400" role="img" aria-label="示意图：相同任务的耗时从三十秒降到十二秒，并非产品实测">
+      <rect x="0" y="0" width="1000" height="400" rx="12" fill="#f8fbfa"/>
+      <g fill="none" stroke="#d0ded9" stroke-width="1"><path d="M100 70H940M100 160H940M100 250H940M100 340H940"/></g>
+      <path d="M100 52V340H950" fill="none" stroke="#7e9791" stroke-width="2"/>
+      <g font-family="sans-serif" font-size="23" fill="#55716c"><text x="25" y="78">30s</text><text x="25" y="168">20s</text><text x="25" y="258">10s</text>
+      <text x="160" y="380">原流程</text><text x="443" y="380">步骤合并</text><text x="735" y="380">结果复用</text></g>
+      <rect x="155" y="70" width="155" height="270" rx="5" fill="#9dbcb4"/><rect x="440" y="178" width="155" height="162" rx="5" fill="#5b9c8c"/><rect x="725" y="232" width="155" height="108" rx="5" fill="#c17850"/>
+      <g font-family="sans-serif" font-size="32" font-weight="700" fill="#173f3b"><text x="198" y="55">30</text><text x="484" y="163">18</text><text x="769" y="217">12</text></g>
+    </svg></div><div data-studio-id="outro-label" data-studio-kind="group" style="position:absolute;left:75px;top:550px;width:1150px;height:50px" ><p class="note">真实报道：换成原始图表或实际 demo，并保留来源与条件</p></div></div></section>
+<script type="module">
+let host;
+export function mount({ root }) { host = root; }
+export function renderAtTime(_seconds, { scene, sceneProgress }) {
+  const dot = host?.querySelector('#starter-clock');
+  if (dot) dot.setAttribute('cx', String(40 + (scene.id === 'pipeline' ? sceneProgress : 0) * 1020));
+}
+export function destroy() { host = null; }
+</script></body></html>

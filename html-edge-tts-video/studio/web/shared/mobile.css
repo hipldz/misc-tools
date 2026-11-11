@@ -1,0 +1,303 @@
+/* Shared small-screen layout. Loaded after the desktop shell and tool styles. */
+@media (max-width: 760px) {
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  .studio-app,
+  .voice-app,
+  .caption-app,
+  .source-app {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+
+  .app-sidebar {
+    position: static;
+    order: -1;
+    display: block;
+    padding: max(6px, env(safe-area-inset-top)) 8px 6px;
+    border: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .app-sidebar .sidebar-brand,
+  .app-sidebar .product-nav .nav-separator {
+    display: none;
+  }
+
+  .app-sidebar .product-nav {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 4px;
+    padding: 0;
+    overflow: visible;
+  }
+
+  .app-sidebar .product-nav a {
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    min-width: 0;
+    min-height: 54px;
+    padding: 6px 2px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  .app-sidebar .product-nav a.active::before { display: none; }
+
+  .studio-app .workspace,
+  .source-workspace,
+  .caption-workspace,
+  .voice-workspace {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+    min-width: 0;
+    padding: 0 10px max(16px, env(safe-area-inset-bottom));
+    overflow: visible;
+  }
+
+  .studio-app .studio-project-header,
+  .source-topbar,
+  .caption-topbar,
+  .voice-topbar {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: auto;
+    gap: 12px;
+    min-height: 0;
+    max-height: none;
+    margin: 10px;
+    padding: 12px;
+    overflow: visible;
+  }
+
+  .studio-app .studio-project-header > *,
+  .source-topbar > *,
+  .caption-topbar > * {
+    grid-column: 1 / -1;
+    grid-row: auto;
+    min-width: 0;
+  }
+
+  .studio-project-header .header-project-picker,
+  .project-picker,
+  .caption-project-picker {
+    width: 100%;
+    margin: 0;
+    font-size: 13px;
+  }
+
+  .studio-project-header .header-project-picker .project-select,
+  .project-picker select,
+  .caption-project-picker select {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    flex: 1;
+  }
+
+  .project-title-row h1 { font-size: 18px; }
+
+  .studio-project-header .header-actions {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
+    overflow: visible;
+  }
+
+  .studio-project-header .header-actions > a,
+  .studio-project-header .header-actions > button {
+    width: 100%;
+    min-width: 0;
+    min-height: 44px;
+    padding: 0 4px;
+    font-size: 12px;
+  }
+
+  .studio-project-header .header-actions span { display: inline; }
+
+  button,
+  .quiet-button,
+  .primary-button,
+  .open-output-button {
+    min-height: 44px;
+    touch-action: manipulation;
+  }
+
+  input:not([type="range"]):not([type="checkbox"]):not([type="color"]),
+  select,
+  textarea {
+    min-width: 0;
+    max-width: 100%;
+    /* Desktop tool controls have several specific small-font rules. */
+    font-size: 16px !important;
+  }
+
+  .studio-app .workspace > .preview-output-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    overflow: visible;
+  }
+
+  .studio-app .workspace .panel,
+  .source-workspace .panel,
+  .caption-workspace .panel,
+  .voice-workspace .panel {
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    flex: 0 0 auto;
+  }
+
+  .studio-app .workspace > .build-panel {
+    overflow-y: visible !important;
+    scrollbar-gutter: auto;
+  }
+
+  .studio-app .build-panel > .panel-heading { position: static; }
+
+  .studio-app .preview-frame-area { flex: 0 0 auto; }
+  .studio-app .preview-panel .preview-source-path { display: none; }
+
+  .studio-app .preview-panel .status-summary {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+    margin: 0;
+  }
+
+  .preview-panel .build-next-step > div {
+    flex-wrap: wrap;
+    white-space: normal;
+  }
+
+  .studio-app .preview-transport {
+    grid-template-columns: auto 36px minmax(0, 1fr) 36px;
+    gap: 5px;
+    padding: 10px;
+  }
+
+  .studio-app .preview-play-button { min-height: 44px; min-width: 60px; }
+  .studio-app .preview-play-button span { display: inline; }
+  .studio-app #previewProgress { height: 32px; }
+
+  .studio-app .build-controls,
+  .tts-field-grid,
+  .export-field-grid,
+  .field-grid,
+  .new-project-choice-grid,
+  .direct-import-grid,
+  .extract-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .studio-app .build-controls .build-control-section button { min-height: 44px; }
+  .studio-app .build-panel .build-controls { align-items: stretch; }
+  .studio-app .build-controls .build-control-section label input,
+  .studio-app .build-controls .build-control-section label select { height: 44px; }
+
+  .studio-workflow-dialog {
+    width: calc(100% - 16px);
+    height: calc(100dvh - 16px);
+    max-height: calc(100dvh - 16px);
+  }
+
+  .workflow-dialog-grid {
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+
+  .workflow-dialog-grid > .panel { flex: 0 0 auto; }
+  .workflow-dialog-grid textarea { min-height: 220px; }
+  .workflow-dialog-grid button { min-height: 44px; }
+  .workflow-dialog-heading { gap: 8px; padding: 10px; }
+  .workflow-dialog-heading button { min-width: 44px; min-height: 44px; }
+  .new-project-dialog { max-height: calc(100dvh - 24px); overflow-y: auto; }
+  .new-project-choice-grid { padding: 12px; }
+  .new-project-choice { min-height: 110px; }
+  .new-project-choice strong { grid-column: 2; grid-row: 1; }
+  .new-project-choice > span:not(.new-project-choice-icon) { grid-column: 2; grid-row: 2; }
+  .new-project-choice > :last-child { grid-column: 3; grid-row: 1 / 3; }
+  .provider-row,
+  .workflow-save-row,
+  .top-actions,
+  .tool-top-actions,
+  .section-heading,
+  .detail-actions,
+  .editor-options { flex-wrap: wrap; }
+
+  .source-app .section-heading > div:not(.editor-tabs) { flex: 1 1 180px; }
+  .source-app .editor-tabs { width: 100%; }
+  .source-app .editor-tabs button { flex: 1; min-height: 44px; font-size: 13px; }
+  .source-app .code-editor { flex: none; height: 320px; resize: vertical; }
+  .source-app .editor-footer { gap: 8px; flex-wrap: wrap; font-size: 11px; }
+
+  .source-app .preview-wrap,
+  .caption-app .preview-frame-wrap {
+    flex: none;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    max-height: 65svh;
+  }
+
+  body[data-aspect-ratio="9:16"] .source-app .preview-wrap,
+  body[data-aspect-ratio="9:16"] .caption-app .preview-frame-wrap { aspect-ratio: 9 / 16; }
+
+  .source-app .object-inspector {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    font-size: 12px;
+  }
+
+  .source-app .object-inspector > strong { grid-column: 1 / -1; max-width: none; font-size: 12px; }
+  .source-app .object-inspector label { min-width: 0; }
+  .source-app .object-inspector input,
+  .source-app .object-inspector select { flex: 1; width: 100%; height: 44px; }
+  .source-app .object-inspector button,
+  .source-app .scene-toolbar button { min-height: 44px; font-size: 12px; }
+  .source-app .scene-toolbar > button { width: 44px; flex: 0 0 44px; }
+  .source-app .media-columns { grid-template-columns: minmax(0, 1fr); }
+  .source-app .missing-list,
+  .source-app .media-list { max-height: 360px; }
+  .source-app .missing-item button,
+  .source-app .media-card-actions button { min-height: 44px; font-size: 12px; }
+
+  .caption-app .scene-list,
+  .caption-app .cue-list { flex: none; max-height: 320px; overflow-y: auto; }
+  .caption-app .cue-table-head,
+  .caption-app .cue-item { grid-template-columns: 24px 52px 52px minmax(0, 1fr) 32px; gap: 3px; }
+  .caption-app .cue-item { min-height: 48px; font-size: 11px; }
+  .caption-app .cue-item .cue-copy { white-space: normal; }
+  .caption-app .timing-editor { grid-template-columns: minmax(0, 1fr); }
+  .caption-app .timing-editor input,
+  .caption-app .timing-editor button { min-height: 44px; }
+  .caption-app .preview-controls { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .caption-app .preview-controls button,
+  .caption-app .list-toolbar button,
+  .caption-app .detail-actions button { min-height: 44px; font-size: 12px; }
+  .caption-app #cueText { min-height: 120px; }
+  .caption-app .detail-actions > span { flex-basis: 100%; overflow-wrap: anywhere; }
+  .caption-app .detail-actions button { flex: 1; }
+
+  .voice-app #textInput { flex: none; min-height: 220px; }
+  .voice-app .history-list { max-height: 360px; }
+  .voice-app .history-item { min-height: 54px; }
+  .voice-app .history-item button { min-width: 44px; min-height: 44px; }
+  .voice-app .generation-flow { min-height: 0; }
+}

@@ -1,0 +1,4 @@
+interface:
+  display_name: "科技短视频口播"
+  short_description: "编写和改写两分钟科技口播，筛选事实、分配画面信息、压缩空话"
+  default_prompt: "用 $write-tech-narration 把这些科技新闻材料写成约两分钟、信息密集但自然的中文口播，并标明适合交给画面的信息。"

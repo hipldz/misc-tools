@@ -1,0 +1,4 @@
+interface:
+  display_name: "HTML TTS Video"
+  short_description: "Create narrated videos from source media and HTML"
+  default_prompt: "Use $html-edge-tts-video to create a narrated MP4 with source materials, deliberate shots, and a self-contained HTML composition."

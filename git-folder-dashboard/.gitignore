@@ -1,0 +1,9 @@
+**/__pycache__
+**/*.pyc
+
+build
+dist
+.venv
+.codex
+AGENTS.md
+*.spec

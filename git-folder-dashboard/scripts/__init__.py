@@ -1,0 +1,2 @@
+"""Git Folder Dashboard package."""
+

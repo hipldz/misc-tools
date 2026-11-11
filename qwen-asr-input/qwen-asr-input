@@ -1,0 +1,157 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+project_dir=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)
+runtime_dir="$project_dir/.runtime"
+pid_file="$runtime_dir/qwen-asr-input.pid"
+log_file="$runtime_dir/qwen-asr-input.log"
+venv_dir="$project_dir/.venv"
+
+launch_python() {
+  if [[ ! -x "$venv_dir/bin/python" ]]; then
+    if ! python3 -m venv "$venv_dir"; then
+      printf '无法创建 Python 虚拟环境；请先安装 python3-venv。\n' >&2
+      return 1
+    fi
+  fi
+
+  if ! "$venv_dir/bin/python" -c 'from importlib.metadata import version; major = int(version("websockets").split(".", 1)[0]); assert 14 <= major < 18; from websockets.asyncio.client import connect' 2>/dev/null; then
+    PIP_CACHE_DIR="$project_dir/.cache/pip" \
+      "$venv_dir/bin/python" -m pip install -r "$project_dir/requirements.txt"
+  fi
+
+  exec env \
+    QWEN_ASR_INPUT_CONFIG="${QWEN_ASR_INPUT_CONFIG:-$project_dir/config.toml}" \
+    PYTHONPATH="$project_dir${PYTHONPATH:+:$PYTHONPATH}" \
+    "$venv_dir/bin/python" -m qwen_asr_input "$@"
+}
+
+read_pid() {
+  [[ -f "$pid_file" ]] || return 1
+  local daemon_pid
+  daemon_pid=$(<"$pid_file")
+  [[ "$daemon_pid" =~ ^[0-9]+$ ]] || return 1
+  printf '%s' "$daemon_pid"
+}
+
+is_running() {
+  local daemon_pid
+  daemon_pid=$(read_pid) || return 1
+  kill -0 "$daemon_pid" 2>/dev/null || return 1
+
+  # A stale PID file must never make us report or stop an unrelated process
+  # that later reused the same numeric PID.
+  local entry
+  while IFS= read -r -d '' entry; do
+    [[ "$entry" == "QWEN_ASR_INPUT_PID_FILE=$pid_file" ]] && return 0
+  done <"/proc/$daemon_pid/environ" 2>/dev/null
+  return 1
+}
+
+start_daemon() {
+  if is_running; then
+    printf 'qwen-asr-input 已在运行（PID %s）\n' "$(read_pid)"
+    return
+  fi
+  if [[ -z "${ALIYUN_ASR_API_KEY:-}" ]]; then
+    printf '错误：请先 export ALIYUN_ASR_API_KEY\n' >&2
+    return 1
+  fi
+  mkdir -p "$runtime_dir"
+  nohup env QWEN_ASR_INPUT_PID_FILE="$pid_file" \
+    "$project_dir/qwen-asr-input" __launch-python "$@" \
+    >>"$log_file" 2>&1 </dev/null &
+  local daemon_pid=$!
+  printf '%s\n' "$daemon_pid" >"$pid_file"
+  sleep 0.3
+  if ! is_running; then
+    rm -f -- "$pid_file"
+    printf '启动失败，请查看 %s\n' "$log_file" >&2
+    return 1
+  fi
+  printf 'qwen-asr-input 已后台常驻（PID %s）\n' "$daemon_pid"
+  printf '日志：%s\n' "$log_file"
+}
+
+stop_daemon() {
+  if ! is_running; then
+    printf 'qwen-asr-input 未运行\n'
+    return
+  fi
+  local daemon_pid
+  daemon_pid=$(read_pid)
+  kill "$daemon_pid"
+  for _ in {1..30}; do
+    is_running || break
+    sleep 0.1
+  done
+  if is_running; then
+    printf '进程 %s 未能及时退出\n' "$daemon_pid" >&2
+    return 1
+  fi
+  rm -f -- "$pid_file"
+  printf 'qwen-asr-input 已停止\n'
+}
+
+show_status() {
+  if is_running; then
+    local daemon_pid
+    daemon_pid=$(read_pid)
+    printf '运行中（PID %s）\n' "$daemon_pid"
+    ps -p "$daemon_pid" -o pid,pcpu,pmem,rss,etime,stat,cmd
+  else
+    printf '未运行\n'
+    return 1
+  fi
+}
+
+show_usage() {
+  cat <<'EOF'
+用法：qwen-asr-input COMMAND [OPTIONS]
+
+  start [OPTIONS]  后台常驻；OPTIONS 传给 Python 程序
+  run [OPTIONS]    前台运行
+  status           查看进程和资源占用
+  logs             持续查看后台日志（Ctrl+C 退出查看，不会停止服务）
+  stop             停止后台进程
+  restart          重启后台进程
+  check            检查本地依赖，不联网
+EOF
+}
+
+command_name=${1:-help}
+if [[ $# -gt 0 ]]; then
+  shift
+fi
+
+case "$command_name" in
+  start) start_daemon "$@" ;;
+  run)
+    if is_running; then
+      printf 'qwen-asr-input 已在运行（PID %s）\n' "$(read_pid)" >&2
+      exit 1
+    fi
+    mkdir -p "$runtime_dir"
+    export QWEN_ASR_INPUT_PID_FILE="$pid_file"
+    launch_python "$@"
+    ;;
+  status) show_status ;;
+  logs)
+    mkdir -p "$runtime_dir"
+    touch "$log_file"
+    exec tail -n 80 -F "$log_file"
+    ;;
+  stop) stop_daemon ;;
+  restart)
+    stop_daemon || true
+    start_daemon "$@"
+    ;;
+  check) launch_python --check "$@" ;;
+  __launch-python) launch_python "$@" ;;
+  help|-h|--help) show_usage ;;
+  *)
+    printf '未知命令：%s\n' "$command_name" >&2
+    show_usage >&2
+    exit 2
+    ;;
+esac
