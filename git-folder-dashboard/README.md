@@ -1,186 +1,118 @@
 # Git Folder Dashboard
 
-[All tools](../README.md) · English | [中文](doc/README.zh-CN.md)
+English | [中文](docs/README.zh-CN.md)
 
-A local web dashboard for managing several Git repositories. Select a parent directory to scan its first-level subdirectories, inspect repository status and file changes, and perform common Git operations.
+A local workspace for managing multiple Git repositories. See local changes and remote differences independently, stage exactly what you intend to commit, and follow background fetch progress without blocking the interface.
 
-![Git Folder Dashboard preview](doc/preview.gif)
+- Workspace overview, searchable repository list, changes, and file diffs
+- Local checks when opening a repository, returning to the window, and every 10 seconds while viewing it
+- Initial local checks followed by bounded background fetches, with per-repository progress and retry
+- Independent local and remote timestamps; failed fetches preserve previous results and display an error
+- Commits respect the index; **Stage all and commit** is a separate, explicit operation
+- Inline errors, persistent commit drafts, light/dark themes, English/Chinese, and responsive layouts
+- Working-tree snapshot export/import through the UI or CLI
+- Optional Basic Auth, URL subpath hosting, periodic workspace fetch, and a Git HTTP proxy
+- All interface resources are local; no CDN or frontend compilation is required
 
-## Contents
+## Run from source
 
-- [Features](#features)
-- [Requirements](#requirements)
-- [Quick start](#quick-start)
-- [Configuration](#configuration)
-- [Working-tree snapshots](#working-tree-snapshots)
-- [Behavior and limitations](#behavior-and-limitations)
-- [Packaging](#packaging)
-- [Project structure](#project-structure)
-- [API reference](#api-reference)
+Git must be installed and available on `PATH`. A modern Python environment is recommended; development and Windows packaging are verified with Python 3.12. Runtime code retains Python 3.6 syntax. The old Python 3.6 / Flask 2.0.3 combination is available through [legacy requirements](requirements-legacy.txt), but was not runtime-tested in this revision.
 
-## Features
+```powershell
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -i https://pypi.tuna.tsinghua.edu.cn/simple -r requirements.txt
+.\.venv\Scripts\python.exe app.py --default-path D:\Workspace\Git
+```
 
-- Scan sibling repositories and show branches, ahead/behind counts, and working-tree changes.
-- Preview staged and unstaged diffs or untracked file contents.
-- Fetch, pull, push, commit, and switch branches.
-- Stage, unstage, discard, delete, or locally ignore files, including bulk actions.
-- Export and import working-tree changes as ZIP snapshots, including binary files.
-- Switch between English/Chinese and light/dark themes.
-- Mount under a URL prefix and optionally require HTTP Basic authentication.
+On Linux/macOS use `.venv/bin/python` instead. Default address: `http://127.0.0.1:8765`.
 
-For example, scanning `~/Code` discovers `project-a` and `project-b` below and lists `notes` as a non-Git directory:
+```powershell
+# Fetch all repositories every five minutes; optional local proxy
+python app.py --default-path D:\Workspace\Git --sync-interval 300 --git-proxy http://127.0.0.1:7890
+
+# Subpath hosting and HTTP Basic authentication
+python app.py --base-path /git --authorize admin:change-me --no-browser
+```
+
+| Option | Default | Purpose |
+| --- | --- | --- |
+| `--host` | `127.0.0.1` | Bind address |
+| `--port` | `8765` | Listen port |
+| `--default-path` | empty | Initial parent directory |
+| `--sync-interval` | `0` | Periodic workspace fetch in seconds; `0` disables it |
+| `--fetch-workers` | `3` | Concurrent local checks/fetches, from 1 to 8 |
+| `--git-proxy` | empty | HTTP proxy used by Git |
+| `--base-path` | empty | URL prefix such as `/git` |
+| `--authorize` | disabled | Basic Auth as `username:password` |
+| `--no-browser` | `false` | Do not open the browser; accepts optional `true/false` |
+
+The old `--defaut-path` and `--no-brower` aliases remain supported. Periodic synchronization is configured at startup, not through UI settings. Initial workspace loading and manual **Fetch remotes** work independently of the periodic interval. Fetch updates remote references; it does not pull, commit, or alter working-tree files. Pull uses `--ff-only`.
+
+The folder picker opens on the machine running the server. Windows uses the native Common Item Dialog and does not need Tk; Linux/macOS use Tk. On a headless/remote server, paste the server-side path instead. Linux folder selection may require `python3-tk`. Git is required separately by the executable too. For external access, place Basic Auth behind HTTPS; the default listener is local.
+
+## Windows one-file release
+
+```powershell
+.\.venv\Scripts\python.exe scripts/build.py --install-dependencies
+```
+
+With dependencies already installed:
+
+```powershell
+.\.venv\Scripts\python.exe scripts/build.py
+# Cross-platform entry point, using the current Python environment:
+python scripts/build.py
+```
+
+The build runs the backend regression suite, packages `static/` and `templates/`, and writes:
 
 ```text
-~/Code/
-├── project-a/.git/
-├── project-b/.git/
-└── notes/
+dist/
+  git-folder-dashboard.exe
+  git-folder-dashboard-2.0.0-windows-amd64.zip
+  SHA256SUMS.txt
 ```
 
-## Requirements
+`build/` holds temporary PyInstaller files and verification screenshots. The executable runs from any directory; it does not need source files beside it. Packaging needs a modern Python/PyInstaller environment. An optional PowerShell wrapper is available at `scripts/build.ps1`. See [development and release checks](docs/development.md).
 
-- Python 3 and Git available on `PATH`.
-- Python dependencies from [requirements.txt](requirements.txt): Flask, Werkzeug, and PyInstaller. PyInstaller is needed for packaging only.
-- Optional folder picker: `tkinter` and a graphical desktop on the machine running the backend. On Ubuntu, `tkinter` is supplied by `python3-tk`; paths can also be entered manually.
+## Snapshots
 
-The code was designed for Python 3.6 / Ubuntu 18.04 compatibility, with Flask 2.0.3 and Werkzeug 2.0.3 as the documented legacy combination. The current requirements file does **not** pin versions; do not assume its latest resolved dependencies support Python 3.6.
-
-## Quick start
-
-From the `misc-tools` root:
-
-```bash
-cd git-folder-dashboard
-python3 -m venv .venv
-source .venv/bin/activate
-python -m pip install -r requirements.txt
-python app.py --default-path ~/Code
+```powershell
+python app.py --export ./ --output ./changes.zip
+python app.py --import ./ ./changes.zip --force
 ```
 
-On Windows, activate with `.venv\Scripts\activate` instead. Subsequent commands in this README run from the `git-folder-dashboard` directory.
+A snapshot contains **changed working-tree files**, including new files, binary contents, and deletions. It is not a full repository backup and does not reconstruct index staging. Import applies only recorded entries and requires explicit confirmation. Export refuses to overwrite an existing archive without `--force`.
 
-Open `http://127.0.0.1:8765/` if the browser does not open automatically. Scan the parent directory, select a repository, and inspect its changes before applying an operation. Paths refer to the backend machine's filesystem.
+## Repository structure
 
-## Configuration
-
-Configuration uses command-line arguments; no `.env` file is required.
-
-| Argument | Purpose | Default |
-| --- | --- | --- |
-| `--host` | Bind address | `127.0.0.1` |
-| `--port` | Listen port | `8765` |
-| `--default-path` | Initial workspace path shown in the UI | Empty |
-| `--base-path` | URL prefix, such as `/git` | Domain root |
-| `--authorize USERNAME:PASSWORD` | Require HTTP Basic authentication | Disabled |
-| `--no-browser [true/false]` | Disable automatic browser opening; a bare flag means `true` | `false` |
-| `--export REPO` | Export a working-tree snapshot and exit | Disabled |
-| `--import REPO SNAPSHOT` | Import a snapshot and exit; requires `--force` | Disabled |
-| `--output FILE`, `-o FILE` | Snapshot export destination | Timestamped ZIP in the current directory |
-| `--force` | Allow export overwrite or confirm snapshot import | Disabled |
-
-The historical aliases `--defaut-path` and `--no-brower` remain supported. Use `python app.py --help` for the command-line reference.
-
-```bash
-# Custom port, workspace, and no automatic browser opening
-python app.py --port 8080 --default-path ~/Code --no-browser
-
-# Serve under /git/ with a login
-python app.py --base-path /git --authorize admin:change-me
+```text
+app.py                         Source and executable entry point
+git_dashboard/
+  cli.py                       Server and snapshot command-line options
+  runtime.py                   Resource paths and URL-prefix middleware
+  web.py                       Application factory, authentication, server lifecycle
+  api.py                       HTTP validation and orchestration
+  http.py                      JSON/download helpers
+  services/
+    git.py                     Git commands, index semantics, file operations
+    folders.py                 Native Windows / Tk folder selection
+    snapshots.py               Working-tree snapshot format
+    workspace.py               Stable identities, state, repository locks
+    tasks.py                   Bounded jobs, progress, periodic fetch
+templates/index.html           Application shell and dialogs
+static/
+  css/app.css                  Themes, layouts, components, responsive rules
+  js/                          Requests, state, localization, rendering, interactions
+  icons/brand.svg              Local branding asset
+scripts/                       Build commands only
+packaging/                     Versioned PyInstaller configuration
+tests/                         Isolated Git, HTTP, CLI, concurrency, browser checks
+docs/                          Chinese guide and engineering documentation
+build/                         Ignored temporary build/verification output
+dist/                          Ignored release artifacts
 ```
 
-The second example opens at `http://127.0.0.1:8765/git/`. A reverse proxy must preserve the configured prefix when forwarding requests. Add `--host 0.0.0.0` when the backend needs to accept connections from other machines.
+[Architecture and API](docs/architecture.md) · [Development and packaging](docs/development.md)
 
-Authentication covers pages, static assets, and APIs. Passwords may contain `:`, but usernames may not. Basic authentication does not encrypt credentials, and command-line arguments may be visible to local processes; use HTTPS when exposing the dashboard over a network.
-
-## Working-tree snapshots
-
-Export or import changes without starting the web server:
-
-```bash
-python app.py --export /path/to/repo
-python app.py --export /path/to/repo --output /tmp/repo-snapshot.zip
-python app.py --import /path/to/repo /tmp/repo-snapshot.zip --force
-```
-
-The repository argument may be the worktree root or a directory inside it. Non-Git directories and bare repositories are rejected. Existing export files require `--force` to overwrite.
-
-A snapshot contains `manifest.json` plus `files/*` payloads for modified, added, deleted, and untracked files. The manifest records relative paths, change kinds, source scopes, and payload locations. The web interface uses the same archive format.
-
-Import directly writes, creates, and deletes the listed working-tree files. It supports binary and nested files, but does not recreate the exact Git index staging layout. A snapshot stores changes rather than a complete repository backup; it does not contain repository history.
-
-## Behavior and limitations
-
-- Scanning covers only the selected directory's first-level children, not recursive descendants or the selected directory itself.
-- Repository IDs and scan results live in memory. Scan again after restarting the backend.
-- **Commit runs `git add .` before `git commit`**, so it includes all eligible changes in the repository, not just previously staged files.
-- Repository-wide discard runs `git reset --hard HEAD` followed by `git clean -fd`, removing tracked changes and untracked files/directories.
-- Ignore actions write to `.git/info/exclude` rather than the shared `.gitignore`.
-- Login is optional and disabled by default. The tool has no per-user repository permissions.
-- Remote operations use the backend machine's existing Git credentials and configuration.
-
-## Packaging
-
-With the dependencies installed, build a standalone executable from this project directory.
-
-Linux/macOS:
-
-```bash
-pyinstaller --onefile --name git-folder-dashboard --add-data "static:static" app.py
-```
-
-Windows:
-
-```bat
-pyinstaller --onefile --name git-folder-dashboard --add-data "static;static" app.py
-```
-
-The output is `dist/git-folder-dashboard` (`.exe` on Windows). Git must still be available on the target machine.
-
-```bash
-./dist/git-folder-dashboard --port 8080 --default-path ~/Code --base-path /git --no-browser
-```
-
-## Project structure
-
-| Path | Responsibility |
-| --- | --- |
-| [app.py](app.py) | Thin entry point calling the CLI |
-| [scripts/cli.py](scripts/cli.py) | Parse arguments and run web or snapshot commands |
-| [scripts/webapp.py](scripts/webapp.py) | Assemble and start the Flask application |
-| [scripts/routes.py](scripts/routes.py) | Routes, validation, repository scanning, and response orchestration |
-| [scripts/runtime.py](scripts/runtime.py) | Runtime configuration, authentication, URL prefix, and browser opening |
-| [scripts/git_service.py](scripts/git_service.py) | Git execution, status parsing, previews, and file operations |
-| [scripts/snapshot_service.py](scripts/snapshot_service.py) | Working-tree snapshot export/import |
-| [scripts/repo_store.py](scripts/repo_store.py) | In-memory repository IDs, paths, and status |
-| [scripts/http_utils.py](scripts/http_utils.py) | JSON request/response and download helpers |
-| [static/](static/) | Plain HTML, CSS, and JavaScript UI |
-
-The request flow is `browser → routes → Git/snapshot service → refreshed repository state → JSON → UI`. Read the CLI and routes first, then the service relevant to the operation.
-
-## API reference
-
-The following paths are relative to `--base-path`. Repository IDs come from scan/list responses and change after a new scan.
-
-| Method | Path | Purpose |
-| --- | --- | --- |
-| GET | `/api/config` | Runtime configuration |
-| POST | `/api/select-folder` | Open the backend machine's folder picker |
-| POST | `/api/scan` | Scan a parent directory |
-| GET | `/api/repos` | List scanned repositories |
-| POST | `/api/repos/refresh-all` | Refresh all scanned repositories |
-| POST | `/api/repos/{id}/refresh` | Refresh one repository |
-| POST | `/api/repos/{id}/fetch` | Fetch |
-| POST | `/api/repos/{id}/pull` | Pull |
-| POST | `/api/repos/{id}/push` | Push |
-| POST | `/api/repos/{id}/push-origin-main` | Push the local main branch to origin |
-| POST | `/api/repos/{id}/open` | Open the repository folder on the backend machine |
-| POST | `/api/repos/{id}/commit` | Stage all eligible changes and commit |
-| POST | `/api/repos/{id}/checkout` | Switch branch |
-| POST | `/api/repos/{id}/discard` | Discard repository changes |
-| POST | `/api/repos/{id}/files/preview` | Preview a diff or file |
-| POST | `/api/repos/{id}/files/action` | Apply a file action |
-| POST | `/api/repos/{id}/files/bulk-action` | Apply a bulk file action |
-| POST | `/api/repos/{id}/export-state` | Download a snapshot ZIP |
-| POST | `/api/repos/{id}/import-state` | Upload and apply a snapshot ZIP |
-
-Repository status values are `clean`, `dirty`, `ahead`, `behind`, `diverged`, `no_remote`, and `error`. See [scripts/routes.py](scripts/routes.py) for request bodies and response fields.
+The workspace contains first-level repository subfolders, including worktrees with a `.git` file. Workspace/task data is held in server memory; browser preferences and commit drafts are stored locally. Restarting the server re-discovers repositories. One server instance shares one workspace across connected browser clients.

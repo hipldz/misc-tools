@@ -1,4 +1,4 @@
-from scripts.cli import main
+from git_dashboard.cli import main
 
 
 if __name__ == "__main__":
